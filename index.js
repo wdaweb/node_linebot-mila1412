@@ -35,8 +35,10 @@ bot.listen('/', process.env.PORT, () => {
 bot.on('message', async event => {
   if (event.message.type === 'text') {
     const result = data.filter(d => {
-      return d.city === event.message.text
+      return d.city === event.message.text && d.limited_time === 'no' && d.socket === 'yes'
     })
+    console.log(result)
+
     const flex = {
       type: 'carousel',
       contents: [
@@ -49,7 +51,7 @@ bot.on('message', async event => {
             contents: [
               {
                 type: 'text',
-                text: 'Brown Cafe',
+                text: `${result[0].name}`,
                 weight: 'bold',
                 size: 'sm',
                 wrap: true
@@ -93,7 +95,7 @@ bot.on('message', async event => {
                         action: {
                           type: 'uri',
                           label: '123',
-                          uri: `http://maps.google.com/?q=${encodeURI(result[0].latitude)},${encodeURI(result[0].longitude)}`
+                          uri: `http://maps.google.com/maps?q=loc:${encodeURI(result[0].latitude)},${encodeURI(result[0].longitude)}`
                         }
                       }
                     ]
@@ -114,7 +116,7 @@ bot.on('message', async event => {
             contents: [
               {
                 type: 'text',
-                text: "Brow&Cony's Restaurant",
+                text: `${result[1].name}`,
                 weight: 'bold',
                 size: 'sm',
                 wrap: true
@@ -158,7 +160,7 @@ bot.on('message', async event => {
                         action: {
                           type: 'uri',
                           label: '123',
-                          uri: `http://maps.google.com/?q=${encodeURI(result[1].latitude)},${encodeURI(result[1].longitude)}`
+                          uri: `http://maps.google.com/maps?q=loc:${encodeURI(result[1].latitude)},${encodeURI(result[1].longitude)}`
                         }
                       }
                     ]
@@ -179,7 +181,7 @@ bot.on('message', async event => {
             contents: [
               {
                 type: 'text',
-                text: 'Tata',
+                text: `${result[2].name}`,
                 weight: 'bold',
                 size: 'sm'
               },
@@ -222,7 +224,7 @@ bot.on('message', async event => {
                         action: {
                           type: 'uri',
                           label: '123',
-                          uri: `http://maps.google.com/?q=${encodeURI(result[2].latitude)},${encodeURI(result[2].longitude)}`
+                          uri: `http://maps.google.com/maps?q=loc:${encodeURI(result[2].latitude)},${encodeURI(result[2].longitude)}`
                         }
                       }
                     ]
@@ -238,7 +240,7 @@ bot.on('message', async event => {
     }
     const message = {
       type: 'flex',
-      altText: '這是 flex',
+      altText: '今天要選哪一間咖啡廳呢？',
       contents: flex
     }
     fs.writeFileSync('aaa.json', JSON.stringify(message, null, 2))
