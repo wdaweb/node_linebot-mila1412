@@ -38,30 +38,20 @@ bot.on('message', async event => {
       return d.city === event.message.text && d.limited_time === 'no' && d.socket === 'yes'
     })
 
-    // if (result.length > 4) {
-    //   const arr = []
-    //   for (const r of result) {
-    //     if (r.wifi === 5 && r.seat === 5) {
-    //       arr.push(r)
-    //     } else if (r.wifi === 5) {
-    //       arr.push(r)
-    //     }
-    //   }
-    //   result = arr
-    // }
-
     const flex = {
       type: 'carousel',
       contents: [
       ]
     }
 
-    const bubbles = []
+    let bubbles = []
     for (const r of result) {
       const name = r.name
       const address = r.address
       const latitude = r.latitude
       const longitude = r.longitude
+      // const wifi = r.wifi
+      // const seat = r.seat
       const b = {
         type: 'bubble',
         size: 'micro',
@@ -128,8 +118,17 @@ bot.on('message', async event => {
         }
       }
       bubbles.push(b)
+
+      if (bubbles.length > 4) {
+        const arr = []
+        for (let i = 1; i <= 5; i++) {
+          const index = Math.round(Math.random() * (bubbles.length - 1))
+          arr.push(bubbles[index])
+          bubbles.splice(index, 1)
+        }
+        bubbles = arr
+      }
     }
-    console.log(bubbles)
     flex.contents = bubbles
 
     const message = {
@@ -140,6 +139,7 @@ bot.on('message', async event => {
 
     fs.writeFileSync('aaa.json', JSON.stringify(message, null, 2))
     event.reply(message)
+    console.log(message)
   }
 })
 
@@ -169,76 +169,5 @@ bot.on('message', async event => {
 //         return dist
 //       }
 //     }
-//   }
-// })
-
-//  {
-//         type: 'location',
-//         title: result[0].name,
-//         address: result[0].address,
-//         latitude: result[0].latitude,
-//         longitude: result[0].longitude
-//       },
-//       {
-//         type: 'location',
-//         title: result[1].name,
-//         address: result[1].address,
-//         latitude: result[1].latitude,
-//         longitude: result[1].longitude
-//       },
-//       {
-//         type: 'location',
-//         title: result[2].name,
-//         address: result[2].address,
-//         latitude: result[2].latitude,
-//         longitude: result[2].longitude
-//       },
-//       {
-//         type: 'location',
-//         title: result[3].name,
-//         address: result[3].address,
-//         latitude: result[3].latitude,
-//         longitude: result[3].longitude
-//       }
-
-// for (const r of result) {
-//   console.log(r)
-// }
-// let name = ''
-// let address = ''
-// let latitude = ''
-// let longitude = ''
-// result.forEach(function (item, index) {
-//   console.log(index)
-//   name += item.name
-//   address += item.address
-//   latitude += item.latitude
-//   longitude += item.longitude
-// })
-
-// flex
-// event.reply({
-//   type: 'flex',
-//   altText: '這是flex',
-//   contents: {
-//     type: 'carousel',
-//     contents: [flex]
-//   }
-// })
-
-// fs
-// bot.on('message', async event => {
-//   if (event.message.type === 'text') {
-//     const message = {
-//       type: 'flex',
-//       altText: '這是 flex',
-//       contents: {
-//         type: 'carousel',
-//         contents: [flex]
-//       }
-//     }
-
-//     fs.writeFileSync('aaa.json', JSON.stringify(message, null, 2))
-//     event.reply(message)
 //   }
 // })
