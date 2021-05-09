@@ -35,7 +35,8 @@ bot.listen('/', process.env.PORT, () => {
 bot.on('message', async event => {
   if (event.message.type === 'text') {
     const result = data.filter(d => {
-      return d.city === event.message.text && d.limited_time === 'no' && d.socket === 'yes'
+      // return d.city === event.message.text && d.limited_time === 'no' && d.socket === 'yes'
+      return d.address.includes(event.message.text) && d.limited_time === 'no' && d.socket === 'yes'
     })
 
     const flex = {
@@ -43,15 +44,9 @@ bot.on('message', async event => {
       contents: [
       ]
     }
-
-    let bubbles = []
-    for (const r of result) {
-      const name = r.name
-      const address = r.address
-      const latitude = r.latitude
-      const longitude = r.longitude
-      // const wifi = r.wifi
-      // const seat = r.seat
+    const bubbles = []
+    for (let i = 0; i < 5; i++) {
+      const random = Math.floor(Math.random() * result.length)
       const b = {
         type: 'bubble',
         size: 'micro',
@@ -61,7 +56,7 @@ bot.on('message', async event => {
           contents: [
             {
               type: 'text',
-              text: `${name}`,
+              text: `${result[random].name}`,
               weight: 'bold',
               size: 'sm',
               wrap: true
@@ -97,7 +92,7 @@ bot.on('message', async event => {
                   contents: [
                     {
                       type: 'text',
-                      text: `${address}`,
+                      text: `${result[random].address}`,
                       wrap: true,
                       color: '#8c8c8c',
                       size: 'xs',
@@ -105,7 +100,7 @@ bot.on('message', async event => {
                       action: {
                         type: 'uri',
                         label: '123',
-                        uri: `http://maps.google.com/?q=${encodeURI(latitude)},${encodeURI(longitude)}`
+                        uri: `http://maps.google.com/maps?q=loc:${encodeURI(result[random].latitude)},${encodeURI(result[random].longitude)}`
                       }
                     }
                   ]
@@ -118,17 +113,8 @@ bot.on('message', async event => {
         }
       }
       bubbles.push(b)
-
-      if (bubbles.length > 4) {
-        const arr = []
-        for (let i = 1; i <= 5; i++) {
-          const index = Math.round(Math.random() * (bubbles.length - 1))
-          arr.push(bubbles[index])
-          bubbles.splice(index, 1)
-        }
-        bubbles = arr
-      }
     }
+    console.log(bubbles)
     flex.contents = bubbles
 
     const message = {
@@ -139,7 +125,6 @@ bot.on('message', async event => {
 
     fs.writeFileSync('aaa.json', JSON.stringify(message, null, 2))
     event.reply(message)
-    console.log(message)
   }
 })
 
