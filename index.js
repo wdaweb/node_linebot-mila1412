@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import axios from 'axios'
 import schedule from 'node-schedule'
 import fs from 'fs'
+import validator from 'validator'
 
 let data = []
 
@@ -61,8 +62,7 @@ bot.on('message', async event => {
   // 放在外面
   const flex = {
     type: 'carousel',
-    contents: [
-    ]
+    contents: []
   }
 
   let bubbles = []
@@ -70,14 +70,17 @@ bot.on('message', async event => {
   if (event.message.type === 'text') {
     const result = data.filter(d => {
       // return d.city === event.message.text && d.limited_time === 'no' && d.socket === 'yes'
-      return d.address.includes(event.message.text) && d.limited_time === 'no' && d.socket === 'yes'
+      return (d.address.includes(event.message.text) || d.name.includes(event.message.text)) && d.limited_time === 'no' && d.socket === 'yes'
     })
-
+    console.log(result)
     for (const r of result) {
+      // 判斷是不是網址
+      r.url = validator.isURL(r.url) ? r.url : `http://maps.google.com/?q=${encodeURI(r.latitude)},${encodeURI(r.longitude)}`
       const b = {
         type: 'bubble',
         size: 'micro',
         body: {
+          backgroundColor: '#FAF2EB',
           type: 'box',
           layout: 'vertical',
           contents: [
@@ -291,38 +294,35 @@ bot.on('message', async event => {
           paddingAll: '13px'
         },
         footer: {
+          backgroundColor: '#AB835E',
           type: 'box',
           layout: 'vertical',
           contents: [
             {
               type: 'button',
-              style: 'secondary',
               action: {
                 type: 'uri',
                 label: 'Website',
                 uri: `${r.url}`
-              }
+              },
+              style: 'link',
+              color: '#FAF2EB'
             }
           ]
         }
       }
       bubbles.push(b)
-
-      if (bubbles.length > 4) {
+      // console.log(bubbles.length)
+      if (bubbles.length > 6) {
         const arr = []
-        for (let i = 1; i <= 5; i++) {
+        for (let i = 1; i <= 6; i++) {
           const index = Math.round(Math.random() * (bubbles.length - 1))
           arr.push(bubbles[index])
           bubbles.splice(index, 1)
-          console.log(index)
-          // const index = Math.round(Math.random() * (bubbles.length - 1))
-          // if (r.wifi === 5 && r.seat === 5) {
-          //   arr.push(bubbles[index])
-          //   bubbles.splice(index, 1)
-          // }
+          // console.log(index)
         }
         bubbles = arr
-        console.log(bubbles.length) // 5
+        // console.log(bubbles.length) // 5
       }
     }
   } else if (event.message.type === 'location') {
@@ -331,12 +331,14 @@ bot.on('message', async event => {
     //   return
     // })
     for (const d of data) {
+      d.url = validator.isURL(d.url) ? d.url : `http://maps.google.com/?q=${encodeURI(d.latitude)},${encodeURI(d.longitude)}`
       const km = distance(d.latitude, d.longitude, event.message.latitude, event.message.longitude)
-      if (km <= 0.5) {
-        const a = {
+      if (km <= 1) {
+        const b = {
           type: 'bubble',
           size: 'micro',
           body: {
+            backgroundColor: '#FAF2EB',
             type: 'box',
             layout: 'vertical',
             contents: [
@@ -353,9 +355,157 @@ bot.on('message', async event => {
                 contents: [
                   {
                     type: 'text',
-                    text: '4.0',
+                    text: 'wifi:',
                     size: 'xs',
                     color: '#8c8c8c',
+                    flex: 5
+                  },
+                  {
+                    type: 'text',
+                    text: `${d.wifi}`,
+                    size: 'xs',
+                    color: '#8c8c8c',
+                    margin: 'sm',
+                    flex: 0
+                  },
+                  {
+                    type: 'icon',
+                    size: 'xs',
+                    url: 'https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png',
+                    margin: 'xs',
+                    offsetTop: '1px'
+                  }
+                ]
+              },
+              {
+                type: 'box',
+                layout: 'baseline',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'seat:',
+                    size: 'xs',
+                    color: '#8c8c8c',
+                    flex: 5
+                  },
+                  {
+                    type: 'text',
+                    text: `${d.seat}`,
+                    size: 'xs',
+                    color: '#8c8c8c',
+                    margin: 'sm',
+                    flex: 0
+                  },
+                  {
+                    type: 'icon',
+                    size: 'xs',
+                    url: 'https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png',
+                    margin: 'xs',
+                    offsetTop: '1px'
+                  }
+                ]
+              },
+              {
+                type: 'box',
+                layout: 'baseline',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'quiet:',
+                    size: 'xs',
+                    color: '#8c8c8c',
+                    flex: 5
+                  },
+                  {
+                    type: 'text',
+                    text: `${d.quiet}`,
+                    size: 'xs',
+                    color: '#8c8c8c',
+                    margin: 'sm',
+                    flex: 0
+                  },
+                  {
+                    type: 'icon',
+                    size: 'xs',
+                    url: 'https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png',
+                    margin: 'xs',
+                    offsetTop: '1px'
+                  }
+                ]
+              },
+              {
+                type: 'box',
+                layout: 'baseline',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'tasty:',
+                    size: 'xs',
+                    color: '#8c8c8c',
+                    flex: 5
+                  },
+                  {
+                    type: 'text',
+                    text: `${d.tasty}`,
+                    size: 'xs',
+                    color: '#8c8c8c',
+                    margin: 'sm',
+                    flex: 0
+                  },
+                  {
+                    type: 'icon',
+                    size: 'xs',
+                    url: 'https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png',
+                    margin: 'xs',
+                    offsetTop: '1px'
+                  }
+                ]
+              },
+              {
+                type: 'box',
+                layout: 'baseline',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'cheap:',
+                    size: 'xs',
+                    color: '#8c8c8c',
+                    flex: 5
+                  },
+                  {
+                    type: 'text',
+                    text: `${d.cheap}`,
+                    size: 'xs',
+                    color: '#8c8c8c',
+                    margin: 'sm',
+                    flex: 0
+                  },
+                  {
+                    type: 'icon',
+                    size: 'xs',
+                    url: 'https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png',
+                    margin: 'xs',
+                    offsetTop: '1px'
+                  }
+                ]
+              },
+              {
+                type: 'box',
+                layout: 'baseline',
+                contents: [
+                  {
+                    type: 'text',
+                    text: 'music:',
+                    size: 'xs',
+                    color: '#8c8c8c',
+                    flex: 5
+                  },
+                  {
+                    type: 'text',
+                    text: `${d.music}`,
+                    size: 'xs',
+                    color: '#8c8c8c',
+                    margin: 'sm',
                     flex: 0
                   },
                   {
@@ -377,15 +527,19 @@ bot.on('message', async event => {
                     spacing: 'sm',
                     contents: [
                       {
+                        type: 'icon',
+                        size: 'xs',
+                        url: 'https://image.flaticon.com/icons/png/128/684/684908.png',
+                        offsetTop: '1px'
+                      },
+                      {
                         type: 'text',
                         text: `${d.address}`,
                         wrap: true,
                         color: '#8c8c8c',
                         size: 'xs',
-                        flex: 5,
                         action: {
                           type: 'uri',
-                          label: '123',
                           uri: `http://maps.google.com/?q=${encodeURI(d.latitude)},${encodeURI(d.longitude)}`
                         }
                       }
@@ -396,21 +550,38 @@ bot.on('message', async event => {
             ],
             spacing: 'sm',
             paddingAll: '13px'
+          },
+          footer: {
+            backgroundColor: '#AB835E',
+            type: 'box',
+            layout: 'vertical',
+            contents: [
+              {
+                type: 'button',
+                action: {
+                  type: 'uri',
+                  label: 'Website',
+                  uri: `${d.url}`
+                },
+                style: 'link',
+                color: '#FAF2EB'
+              }
+            ]
           }
         }
-        bubbles.push(a)
+        bubbles.push(b)
       }
-      console.log(d.address + km)
     }
   }
 
   // 放在外面
   flex.contents = bubbles
+  console.log(flex.contents[0].body)
   const message = {
     type: 'flex',
     altText: '今天要選哪一間咖啡廳呢？',
     contents: flex
   }
-  fs.writeFileSync('aaa.json', JSON.stringify(message, null, 2))
   event.reply(message)
+  fs.writeFileSync('aaa.json', JSON.stringify(message, null, 2))
 })
