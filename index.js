@@ -72,7 +72,6 @@ bot.on('message', async event => {
       // return d.city === event.message.text && d.limited_time === 'no' && d.socket === 'yes'
       return (d.address.includes(event.message.text) || d.name.includes(event.message.text)) && d.limited_time === 'no' && d.socket === 'yes'
     })
-    console.log(result)
     for (const r of result) {
       // 判斷是不是網址
       r.url = validator.isURL(r.url) ? r.url : `http://maps.google.com/?q=${encodeURI(r.latitude)},${encodeURI(r.longitude)}`
@@ -330,6 +329,7 @@ bot.on('message', async event => {
     //   const km = distance(event.message.latitude, event.message.longitude, d.latitude, d.longitude)
     //   return
     // })
+    let arr = []
     for (const d of data) {
       d.url = validator.isURL(d.url) ? d.url : `http://maps.google.com/?q=${encodeURI(d.latitude)},${encodeURI(d.longitude)}`
       const km = distance(d.latitude, d.longitude, event.message.latitude, event.message.longitude)
@@ -519,6 +519,28 @@ bot.on('message', async event => {
               },
               {
                 type: 'box',
+                layout: 'baseline',
+                contents: [
+                  {
+                    type: 'text',
+                    text: '距離:',
+                    size: 'xs',
+                    color: '#8c8c8c',
+                    flex: 5
+                  },
+                  {
+                    type: 'text',
+                    text: `${Math.round(km * 1000)}m`,
+                    size: 'xs',
+                    color: '#8c8c8c',
+                    margin: 'sm',
+                    offsetEnd: 'xs',
+                    flex: 0
+                  }
+                ]
+              },
+              {
+                type: 'box',
                 layout: 'vertical',
                 contents: [
                   {
@@ -569,19 +591,53 @@ bot.on('message', async event => {
             ]
           }
         }
-        bubbles.push(b)
+        // 距離由近至遠
+        arr.push({ b, km })
       }
     }
+    console.log(arr)
+    // undefined?
+    console.log(arr.b)
+    console.log(arr.km)
+
+    arr = arr
+      .sort((a, b) => {
+        return a.km - b.km
+      })
+      .map(a => {
+        return a.b
+      })
+      // 回傳10個
+      // 不用設長度 就算不到10個也不會發生錯誤
+      .slice(0, 10)
+
+    bubbles = arr
   }
 
   // 放在外面
   flex.contents = bubbles
-  console.log(flex.contents[0].body)
+  console.log(bubbles.length)
   const message = {
     type: 'flex',
     altText: '今天要選哪一間咖啡廳呢？',
     contents: flex
   }
+
+  // switch (event.message.text) {
+  //   case ('亂'):
+  //     event.reply({ type: 'text', text: '你再給我亂看看' })
+  //     break
+  //   default:
+  //     event.reply(message)
+  //     break
+  // }
+
+  if (bubbles.length === 0) {
+    event.reply({ type: 'text', text: '哭哭，您搜尋的區域沒有結果，再換一個吧~' })
+  } else {
+    event.reply(message)
+  }
   event.reply(message)
+  console.log(event.message)
   fs.writeFileSync('aaa.json', JSON.stringify(message, null, 2))
 })

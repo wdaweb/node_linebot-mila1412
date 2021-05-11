@@ -1,0 +1,8 @@
+{
+  "type": "flex",
+  "altText": "今天要選哪一間咖啡廳呢？",
+  "contents": {
+    "type": "carousel",
+    "contents": []
+  }
+}
