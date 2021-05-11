@@ -1,4 +1,3 @@
-=======
 # 泰山職訓前端班期中作業
 請學員製作⼀個查詢公開資料的 LINE 機器⼈，並部署到 [heroku](https://www.heroku.com/)  
 資料來源不限，可使⽤ Google API、[政府開放資料](https://data.gov.tw/)等  
@@ -25,4 +24,3 @@
 
 ## 作業連結
 - [儲存庫](https://github.com/mila1412/node_linebot-mila1412)
->>>>>>> master
