@@ -23,4 +23,4 @@
 若使用 GitHub 網頁進行 commit 會依次數扣分
 
 ## 作業連結
-- [儲存庫](https://github.com/mila1412/node_linebot-mila1412)
+- [儲存庫](https://github.com/mila1412/Linebot-Cafe)
